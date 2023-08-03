@@ -1,0 +1,48 @@
+Sid.js(['https://payments.terminal3.com/js/placeholder.js?1'], function() {
+	if (typeof inputPlaceholder === 'function') {
+		$$('[placeholder]').each(function(obj){inputPlaceholder(obj);});
+	}
+},'head');
+
+	if ($('country_select')) {
+	$('country_select').observe('change', function(event) {
+	  var co_code = event.findElement().value;
+	  new Ajax.Request('https://payments.terminal3.com/api/gateway/get-state?key=ca7b4af38f802057c91796fd0d3c525b&uid=74264420&skey=c38ccb17a1a6fc9a6d1a53be0efcc60b', {
+		method: 'GET',
+		parameters: {co_code: co_code},
+		onSuccess: function (transport) {
+		  var defaultOption = '';
+		  defaultOption = 'Province / État';
+		  if (transport.responseText == '[]') {
+			var html = '<input type="text" style="width:146px; top:34px; right:0;" name="state" class="textfield" placeholder="'+ defaultOption +'" maxlength="40" ">'
+		  } else {
+			var rsp = transport.responseText.evalJSON();
+			var html = '<select style="width:156px; top:34px; right:0;" class="textfield" name="state">';
+			html += '<option value="">' + defaultOption + '</option>'
+			$H(rsp).each(function(r) {
+			  html += '<option value="'+r.key+'">'+r.value+'</option>';
+			});
+			html += '</select>';
+		  }
+		  $('state_select').update(html);
+		  if (typeof inputPlaceholder === 'function') {
+			$$('[placeholder]').each(function(obj){inputPlaceholder(obj);});
+		  }
+		}
+	  });
+	});
+	}
+
+	if ($('select_card')) {
+		$$('#select_card div').each(function(obj) {
+		if (obj.select('[name="uc_token"]').length == 1) {
+
+		  obj.observe('click', function(e) {
+			$('select_card').select('.sel').each(function(o) {o.removeClassName('sel');});
+			$('select_card').select('[type="radio"]').each(function(o) {o.removeAttribute('checked');});
+			this.select('[type="radio"]').each(function(o) {o.setAttribute('checked',1);});
+			this.addClassName('sel');
+		  });
+		}
+	  });
+	}
